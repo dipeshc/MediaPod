@@ -1,0 +1,54 @@
+@using MediaPod.Interfaces.Models;
+@using MediaPod.Web.Extensions;
+@using MediaPod.Web.Routes;
+@using ServiceStack.Common.Web;
+@using ServiceStack.ServiceClient.Web;
+@using ServiceStack.WebHost.Endpoints;
+@{
+	var tvShowCollection = (ITVShowCollection) @Model.TVShowCollection;
+	var tvShowCollectionGroupedBySeason = tvShowCollection.OrderByDescending(ts => ts.SeasonNumber).ThenByDescending(ts => ts.EpisodeNumber).GroupBy(tvShow => tvShow.SeasonNumber);
+	var firstTVShowInCollection = tvShowCollection.First();
+	var tvShowCollectionArtwork = firstTVShowInCollection.Artwork==null ? "" : firstTVShowInCollection.Artwork.ToWebImage();
+	var tvShowPodcastUrl = new TVShowPodcastRequest() {TVShowName = firstTVShowInCollection.TVShowName }.ToUrl(HttpMethods.Get, EndpointHost.Config.DefaultContentType.ToContentFormat());
+}
+<script>
+</script>
+<div class="row">
+	<h3 class="span6">@firstTVShowInCollection.TVShowName</h3>
+	<div class="span2" style="margin:20px 30px;text-align:right;">
+		<button class="subscribe btn" onclick="window.open('@tvShowPodcastUrl')" >Subscribe</button>
+	</div>
+</div>
+<div class="row">
+	<div class="span8" style="height:340px;overflow:scroll;">
+		@foreach(var tvShowSeasonCollection in tvShowCollectionGroupedBySeason)
+		{
+		<div class="accordion-group">
+			<div class="accordion-heading">
+				<a class="accordion-toggle" data-toggle="collapse" href="@string.Format("#season{0}", tvShowSeasonCollection.Key)">Season @tvShowSeasonCollection.Key</a>
+			</div>
+			<div id="@string.Format("season{0}", tvShowSeasonCollection.Key)" class="accordion-body collapse in">
+				<div class="accordion-inner">
+					<table class="table">
+					@foreach(var tvShow in tvShowSeasonCollection)
+					{
+						var tvShowUrl = new TVShowFileRequest() {TVShowName = tvShow.TVShowName, SeasonNumber=tvShow.SeasonNumber, EpisodeNumber=tvShow.EpisodeNumber, FileName=tvShow.File.Name }.ToUrl(HttpMethods.Get, EndpointHost.Config.DefaultContentType.ToContentFormat());
+						<tr>
+							<td>@tvShow.EpisodeNumber</td>
+							<td>@tvShow.Name</td>
+							<td>@tvShow.ReleaseDate.ToString("ddd, dd/MM/yyyy")</td>
+							<td>
+								<a target="_blank" href="@tvShowUrl">Watch</a>
+							</td>
+						</tr>
+					}
+					</table>
+				</div>
+			</div>
+		</div>
+		}
+	</div>
+	<div class="span4">
+		<img class="img-polaroid" style="width:220px;" alt="@firstTVShowInCollection.TVShowName" src="@tvShowCollectionArtwork" />
+	</div>
+</div>

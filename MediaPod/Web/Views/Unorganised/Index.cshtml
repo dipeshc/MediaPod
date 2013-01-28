@@ -1,0 +1,28 @@
+@using MediaPod.Interfaces.Models;
+@using MediaPod.Web.Extensions;
+@using MediaPod.Web.Routes;
+@using ServiceStack.Common.Web;
+@using ServiceStack.ServiceClient.Web;
+@using ServiceStack.WebHost.Endpoints;
+@{
+	_Layout = "Layout";
+	var unorganisedMedia = (IEnumerable<IMediaFile>) @Model.UnorganisedMedia;
+}
+<h2>Unorganised Media</h2>
+<table class="table">
+	<thead>
+		<th>File</th>
+	</thead>
+	<tbody>
+	@foreach(var media in unorganisedMedia)
+	{
+		var metaDataUpdaterUrl = new MetadataUpdaterTVShowRequest() { Path = media.File.FullName }.ToUrl(HttpMethods.Get, EndpointHost.Config.DefaultContentType.ToContentFormat());
+		<tr>
+			<td>@media.File.FullName</td>
+			<td>
+				<a href="@metaDataUpdaterUrl">Organise</a>
+			</td>
+		</tr>
+	}
+	</tbody>
+</table>

@@ -1,0 +1,7 @@
+[Bb]in/
+[Oo]bj/
+[Oo]utput/
+.DS_Store
+*.userprefs
+App_Data/
+test-results/

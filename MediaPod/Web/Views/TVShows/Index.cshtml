@@ -1,0 +1,40 @@
+@using System.Collections.Generic;
+@using MediaPod.Interfaces.Models;
+@using MediaPod.Web.Extensions;
+@using MediaPod.Web.Routes;
+@using ServiceStack.Common.Web;
+@using ServiceStack.ServiceClient.Web;
+@using ServiceStack.WebHost.Endpoints;
+@{
+	_Layout = "Layout";
+	var tvShowCollections = (IEnumerable<ITVShowCollection>) @Model.TVShowCollections;
+}
+<script>
+	$(document).ready(function()
+	{
+		$(".mediaThumbnail").click(function()
+		{
+			$(".mediaDetails").load($(this).attr("href"));
+			return false;
+		}).first().click();
+	});
+</script>
+<div class="row">
+	<h2>TV Shows</h2>
+	<div class="span12">
+		<ul class="thumbnails" style="min-height:200px;max-height:460px;overflow:scroll;">
+		@foreach(var tvShowCollection in tvShowCollections)
+		{
+			var firstTVShowInCollection = tvShowCollection.First();
+			var tvShowCollectionUrl = new TVShowRequest() {TVShowName = firstTVShowInCollection.TVShowName }.ToUrl(HttpMethods.Get, EndpointHost.Config.DefaultContentType.ToContentFormat());
+			var tvShowCollectionArtwork = firstTVShowInCollection.Artwork==null ? "" : firstTVShowInCollection.Artwork.ToWebImage();
+			<li>
+				<a href="@tvShowCollectionUrl" class="mediaThumbnail thumbnail">
+					<img data-src="holder.js/180x240" style="width:180px;height:240px;" alt="@firstTVShowInCollection.TVShowName" src="@tvShowCollectionArtwork" />
+				</a>
+			</li>
+		}
+		</ul>
+	</div>
+	<div class="mediaDetails span12"></div>
+</div>

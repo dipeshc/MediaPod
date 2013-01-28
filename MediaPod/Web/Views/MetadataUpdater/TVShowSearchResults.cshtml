@@ -1,0 +1,37 @@
+@using MediaPod.Web.Extensions;
+@using MediaPod.Interfaces.Models;
+@{
+	var results = (IEnumerable<ITVShowMetadata>) @Model.Results;
+}
+<table class="table table-striped" style="font-size:0.9em;">
+@foreach(var tvShowMetadata in results)
+{
+	var tvShowMetadataArtwork = tvShowMetadata.Artwork==null?"":tvShowMetadata.Artwork.ToWebImage();
+	<tr class="result">
+		<td class="span1">
+			<img src="@tvShowMetadataArtwork" />
+		</td>
+		<td class="span2">@tvShowMetadata.TVShowName</td>
+		<td class="span1">@tvShowMetadata.SeasonNumber x @tvShowMetadata.EpisodeNumber</td>
+		<td class="span3">@tvShowMetadata.Name</td>
+		<td class="span1">@tvShowMetadata.ReleaseDate.ToString("dddd dd/MM/yyyy")</td>
+		<td class="span1">
+			<a class="fill">Fill</a>
+		</td>
+		<td class="data" style="display:none;">
+			<div class="dataTVShowName">@tvShowMetadata.TVShowName</div>
+			<div class="dataSeasonNumber">@tvShowMetadata.SeasonNumber</div>
+			<div class="dataEpisodeNumber">@tvShowMetadata.EpisodeNumber</div>
+			<div class="dataName">@tvShowMetadata.Name</div>
+			<div class="dataDescription">@tvShowMetadata.Description</div>
+			<div class="dataGenres">@string.Join(", ", tvShowMetadata.Genres)</div>
+			<div class="dataCast">@string.Join(", ", tvShowMetadata.Cast)</div>
+			<div class="dataDirectors">@string.Join(", ", tvShowMetadata.Directors)</div>
+			<div class="dataScreenwriters">@string.Join(", ", tvShowMetadata.Screenwriters)</div>
+			<div class="dataReleaseDate">@tvShowMetadata.ReleaseDate.ToString("yyyy-MM-dd")</div>
+			<div class="dataNetwork">@tvShowMetadata.Network</div>
+			<img class="dataArtwork" src="@tvShowMetadataArtwork" />
+		</td>
+	</tr>
+}
+</table>

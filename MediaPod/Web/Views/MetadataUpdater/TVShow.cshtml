@@ -1,0 +1,195 @@
+@using System.IO.Abstractions;
+@using MediaPod.Extractors;
+@using MediaPod.Web.Extensions;
+@using MediaPod.Web.Routes;
+@using ServiceStack.Common.Web;
+@using ServiceStack.ServiceClient.Web;
+@using ServiceStack.WebHost.Endpoints;
+@{
+	_Layout = "Layout";
+	
+	// Save model data locally.
+	var file = (FileInfoBase) @Model.File;
+	
+	// Extract recommended search details.
+	var tvShowName = "";
+	int? seasonNumber = null;
+	int? episodeNumber = null;
+
+	var tvShowFileRegexExtractor = new TVShowFilenameRegexExtractor(file.Name);
+	if(tvShowFileRegexExtractor.Extract())
+	{
+		tvShowName = tvShowFileRegexExtractor.TVShowName;
+		seasonNumber = tvShowFileRegexExtractor.SeasonNumber;
+		episodeNumber = tvShowFileRegexExtractor.EpisodeNumber;
+	}
+	
+	var searchUrl = new MetadataUpdaterTVShowSearchRequest().ToUrl(HttpMethods.Get, EndpointHost.Config.DefaultContentType.ToContentFormat());
+	var updateUrl = new MetadataUpdaterTVShowUpdateRequest() {Path = @file.FullName }.ToUrl(HttpMethods.Post, EndpointHost.Config.DefaultContentType.ToContentFormat());
+}
+<script>
+	$(document).ready(function()
+	{
+		var $searchTVShowName = $(".searchTVShowName");
+		var $searchSeasonNumber = $(".searchSeasonNumber");
+		var $searchEpisodeNumber = $(".searchEpisodeNumber");
+		var $searchResults = $(".searchResults");
+		
+		$searchTVShowName.add($searchSeasonNumber).add($searchEpisodeNumber).bind('change', function()
+		{
+			$.ajax(
+			{
+				url : '@searchUrl',
+				type : 'GET',
+				data :
+				{
+					'TVShowName' : $searchTVShowName.val(),
+					'SeasonNumber' :  $searchSeasonNumber.val(),
+					'EpisodeNumber' : $searchEpisodeNumber.val()
+				},
+				success : function(data)
+				{
+					$searchResults.html(data);
+				}
+			});
+		}).trigger('change');
+		
+		$('.fill').live('click', function()
+		{
+			// Get the data and the details.
+			var $data = $(this).parents(".result").find(".data");
+			var $details = $(".details");
+			
+			// Extract.
+			var tvShowName = $data.find(".dataTVShowName").text();
+			var seasonNumber = $data.find(".dataSeasonNumber").text();
+			var episodeNumber = $data.find(".dataEpisodeNumber").text();
+			var name = $data.find(".dataName").text();
+			var description = $data.find(".dataDescription").text();
+			var genres = $data.find(".dataGenres").text();
+			var cast = $data.find(".dataCast").text();
+			var directors = $data.find(".dataDirectors").text();
+			var screenwriters = $data.find(".dataScreenwriters").text();
+			var releaseDate = $data.find(".dataReleaseDate").text();
+			var network = $data.find(".dataNetwork").text();
+			var artwork = $data.find(".dataArtwork").attr("src");
+			
+			// Fill.
+			$details.find(".detailTVShowName").val(tvShowName);
+			$details.find(".detailSeasonNumber").val(seasonNumber);
+			$details.find(".detailEpisodeNumber").val(episodeNumber);
+			$details.find(".detailName").val(name);
+			$details.find(".detailDescription").val(description);
+			$details.find(".detailGenres").val(genres);
+			$details.find(".detailCast").val(cast);
+			$details.find(".detailDirectors").val(directors);
+			$details.find(".detailScreenwriters").val(screenwriters);
+			$details.find(".detailReleaseDate").val(releaseDate);
+			$details.find(".detailNetwork").val(network);
+			$details.find(".detailArtwork").attr("src", artwork);
+		});
+		
+		$(".save").bind("click", function()
+		{
+			var $details = $(".details");
+			$.ajax(
+			{
+				url : "@updateUrl",
+				type : 'POST',
+				data :
+				{
+					TVShowName : $details.find(".detailTVShowName").val(),
+					SeasonNumber : $details.find(".detailSeasonNumber").val(),
+					EpisodeNumber : $details.find(".detailEpisodeNumber").val(),
+					Name : $details.find(".detailName").val(),
+					Description : $details.find(".detailDescription").val(),
+					Genres : $details.find(".detailGenres").val(),
+					Cast : $details.find(".detailCast").val(),
+					Directors : $details.find(".detailDirectors").val(),
+					Screenwriters : $details.find(".detailScreenwriters").val(),
+					ReleaseDate : $details.find(".detailReleaseDate").val(),
+					Network : $details.find(".detailNetwork").val(),
+					Artwork : $details.find(".detailArtwork").attr("src")
+				},
+				success : function()
+				{
+					//location = "/"
+				}
+			});
+		});
+	});
+</script>
+<div class="row">
+	<h2>MetaData Updater</h2>
+	<div class="row">
+		<h5 class="span6">@file.FullName</h5>
+		<button class="offset4 span2 save">Save Updates</button>
+	</div>
+	<div class="search span6">
+		<h3>Search</h3>
+		<div class="row">
+			<div class="span2">TV Show Name</div>
+			<input type="text" class="searchTVShowName span4" placeholder="Enter TV Show Name" value="@tvShowName" />
+		</div>
+		<div class="row">
+			<div class="span2">Season & Episode #</div>
+			<input type="number" class="searchSeasonNumber span2" value="@seasonNumber" />
+			<input type="number" class="searchEpisodeNumber span2" value="@episodeNumber" />
+		</div>
+		<div class="searchResults"></div>
+	</div>
+	<div class="details span6">
+		<h3>Details</h3>
+		<div class="row">
+			<div class="span4">
+				<div class="row">
+					<div class="span2">TV Show Name</div>
+					<input type="text" class="span2 detailTVShowName" placeholder="Enter TV Show Name" />
+				</div>
+				<div class="row">
+					<div class="span2">Season Number</div>
+					<input type="number" class="span2 detailSeasonNumber" placeholder="Enter Season #" />
+				</div>
+				<div class="row">
+					<div class="span2">Episode Number</div>
+					<input type="number" class="span2 detailEpisodeNumber" placeholder="Enter Episode #" />
+				</div>
+				<div class="row">
+					<div class="span2">Episode Name</div>
+					<input type="text" class="span2 detailName" placeholder="Enter Episode Name" />
+				</div>
+				<div class="row">
+					<div class="span2">Release Date</div>
+					<input type="date" class="span2 detailReleaseDate" placeholder="Enter Release Date"  />
+				</div>
+				<div class="row">
+					<div class="span2">Network</div>
+					<input type="text" class="span2 detailNetwork" placeholder="Enter Network" />
+				</div>
+			</div>
+			<div class="span2">
+				<img class="detailArtwork" style="margin-left:-35px;width:155px;height:225px;border:thin solid #F9F9F9;" />
+			</div>
+		</div>
+		<div class="row">
+			<div class="span2">Description</div>
+			<textarea class="span4 detailDescription" placeholder="Enter Descriptions"></textarea>
+		</div>
+		<div class="row">
+			<div class="span2">Genres</div>
+			<input type="text" class="span4 detailGenres" placeholder="Enter Genres (comma seperated)" />
+		</div>
+		<div class="row">
+			<div class="span2">Cast</div>
+			<input type="text" class="span4 detailCast" placeholder="Enter Cast (comma seperated)" />
+		</div>
+		<div class="row">
+			<div class="span2">Directors</div>
+			<input type="text" class="span4 detailDirectors" placeholder="Enter Directors (comma seperated)" />
+		</div>
+		<div class="row">
+			<div class="span2">Screenwriters</div>
+			<input type="text" class="span4 detailScreenwriters" placeholder="Enter Writers (comma seperated)" />
+		</div>
+	</div>
+</div>

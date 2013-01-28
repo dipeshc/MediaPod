@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>10.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C0D8A130-58A9-48F2-ADED-0DFECA681FBA}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>MediaPod</RootNamespace>
+    <AssemblyName>MediaPod</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <Externalconsole>True</Externalconsole>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>none</DebugType>
+    <Optimize>True</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <Externalconsole>True</Externalconsole>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.IO.Abstractions">
+      <HintPath>..\packages\System.IO.Abstractions.1.4.0.40\lib\net35\System.IO.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="TvdbLib">
+      <HintPath>..\packages\TVDBLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Posix" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="ServiceStack.Text">
+      <HintPath>..\packages\ServiceStack.Text.3.9.33\lib\net35\ServiceStack.Text.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.ServiceInterface">
+      <HintPath>..\packages\ServiceStack.3.9.33\lib\net35\ServiceStack.ServiceInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack">
+      <HintPath>..\packages\ServiceStack.3.9.33\lib\net35\ServiceStack.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Common">
+      <HintPath>..\packages\ServiceStack.Common.3.9.33\lib\net35\ServiceStack.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Interfaces">
+      <HintPath>..\packages\ServiceStack.Common.3.9.33\lib\net35\ServiceStack.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="RazorEngine">
+      <HintPath>..\packages\RazorEngine.3.0.8\lib\net40\RazorEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor">
+      <HintPath>..\packages\RazorEngine.3.0.8\lib\net40\System.Web.Razor.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Managers\ResourceManager.cs" />
+    <Compile Include="Extensions\TVDBCacheExtensions.cs" />
+    <Compile Include="Extensions\XMLSerializerExtensions.cs" />
+    <Compile Include="Web\AppHost.cs" />
+    <Compile Include="Web\Services\TVShowService.cs" />
+    <Compile Include="Managers\WebserverManager.cs" />
+    <Compile Include="Web\Services\StaticService.cs" />
+    <Compile Include="Web\Services\BaseService.cs" />
+    <Compile Include="Web\Extensions\WebFileExtensions.cs" />
+    <Compile Include="Web\Extensions\RoutingExtensions.cs" />
+    <Compile Include="Web\Routes\TVShowRoutes.cs" />
+    <Compile Include="Web\Routes\StaticRoutes.cs" />
+    <Compile Include="Web\Routes\UnorganisedRoutes.cs" />
+    <Compile Include="Web\Services\UnorganisedService.cs" />
+    <Compile Include="Web\Services\MetadataUpdaterService.cs" />
+    <Compile Include="Web\Routes\MetadataUpdaterTVShowRoutes.cs" />
+    <Compile Include="Tasks\AddToLibrary.cs" />
+    <Compile Include="Tasks\EncodeMetadata.cs" />
+    <Compile Include="Tasks\Remux.cs" />
+    <Compile Include="Extractors\MediaStreamsExtractor.cs" />
+    <Compile Include="Externals\External.cs" />
+    <Compile Include="Tasks\RemuxEncodeMetadataAndAddToLibrary.cs" />
+    <Compile Include="Tasks\BaseTask.cs" />
+    <Compile Include="Web\Routes\QueueRoutes.cs" />
+    <Compile Include="Interfaces\ITask.cs" />
+    <Compile Include="Interfaces\Models\ITVShow.cs" />
+    <Compile Include="Interfaces\Models\ITVShowCollection.cs" />
+    <Compile Include="Interfaces\Models\ITVShowMetadata.cs" />
+    <Compile Include="Sources\TVDBTVShowMetadataSource.cs" />
+    <Compile Include="Libraries\TVShowLibrary.cs" />
+    <Compile Include="Extensions\ImageFileExtensions.cs" />
+    <Compile Include="Libraries\UnorganisedLibrary.cs" />
+    <Compile Include="Interfaces\Models\IMediaFile.cs" />
+    <Compile Include="Extractors\TVShowMpegFileMetadataExtractor.cs" />
+    <Compile Include="Extractors\TVShowFilenameRegexExtractor.cs" />
+    <Compile Include="Interfaces\ITVShowMetadataSource.cs" />
+    <Compile Include="Managers\QueuedTaskManager.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Managers\" />
+    <Folder Include="Externals\" />
+    <Folder Include="Extensions\" />
+    <Folder Include="Web\" />
+    <Folder Include="Web\Services\" />
+    <Folder Include="Web\Static\" />
+    <Folder Include="Web\Static\bootstrap\" />
+    <Folder Include="Web\Views\Unorganised\" />
+    <Folder Include="Web\Routes\" />
+    <Folder Include="Web\Views\MetadataUpdater\" />
+    <Folder Include="Tasks\" />
+    <Folder Include="Extractors\" />
+    <Folder Include="Interfaces\Models\" />
+    <Folder Include="Sources\" />
+    <Folder Include="Libraries\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Web\Views\Layout.cshtml" />
+    <EmbeddedResource Include="Web\Views\TVShows\Details.cshtml" />
+    <EmbeddedResource Include="Web\Views\TVShows\Index.cshtml" />
+    <EmbeddedResource Include="Web\Static\jquery-1.8.3.min.js" />
+    <EmbeddedResource Include="Web\Static\bootstrap\css\bootstrap.css" />
+    <EmbeddedResource Include="Web\Static\bootstrap\css\bootstrap.min.css" />
+    <EmbeddedResource Include="Web\Static\bootstrap\img\glyphicons-halflings-white.png" />
+    <EmbeddedResource Include="Web\Static\bootstrap\img\glyphicons-halflings.png" />
+    <EmbeddedResource Include="Web\Static\bootstrap\js\bootstrap.js" />
+    <EmbeddedResource Include="Web\Static\bootstrap\js\bootstrap.min.js" />
+    <EmbeddedResource Include="Web\Static\font-awesome.css" />
+    <EmbeddedResource Include="Web\Views\TVShows\Podcast.cshtml" />
+    <EmbeddedResource Include="Web\Views\Unorganised\Index.cshtml" />
+    <EmbeddedResource Include="Web\Views\MetadataUpdater\TVShow.cshtml" />
+    <EmbeddedResource Include="Web\Views\MetadataUpdater\TVShowSearchResults.cshtml" />
+    <EmbeddedResource Include="Externals\SublerCLI" />
+    <EmbeddedResource Include="Externals\FFmpeg" />
+  </ItemGroup>
+</Project>
