@@ -23,29 +23,27 @@
 	<div class="span8" style="height:340px;overflow:scroll;">
 		@foreach(var tvShowSeasonCollection in tvShowCollectionGroupedBySeason)
 		{
-		<div class="accordion-group">
-			<div class="accordion-heading">
-				<a class="accordion-toggle" data-toggle="collapse" href="@string.Format("#season{0}", tvShowSeasonCollection.Key)">Season @tvShowSeasonCollection.Key</a>
-			</div>
-			<div id="@string.Format("season{0}", tvShowSeasonCollection.Key)" class="accordion-body collapse in">
-				<div class="accordion-inner">
-					<table class="table">
-					@foreach(var tvShow in tvShowSeasonCollection)
-					{
-						var tvShowUrl = new TVShowFileRequest() {TVShowName = tvShow.TVShowName, SeasonNumber=tvShow.SeasonNumber, EpisodeNumber=tvShow.EpisodeNumber, FileName=tvShow.File.Name }.ToUrl(HttpMethods.Get, EndpointHost.Config.DefaultContentType.ToContentFormat());
-						<tr>
-							<td>@tvShow.EpisodeNumber</td>
-							<td>@tvShow.Name</td>
-							<td>@tvShow.ReleaseDate.ToString("ddd, dd/MM/yyyy")</td>
-							<td>
-								<a target="_blank" href="@tvShowUrl">Watch</a>
-							</td>
-						</tr>
-					}
-					</table>
-				</div>
-			</div>
-		</div>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Season @tvShowSeasonCollection.Key</th>
+				</tr>
+			</thead>
+			<tbody>
+			@foreach(var tvShow in tvShowSeasonCollection)
+			{
+				var tvShowUrl = new TVShowFileRequest() {TVShowName = tvShow.TVShowName, SeasonNumber=tvShow.SeasonNumber, EpisodeNumber=tvShow.EpisodeNumber, FileName=tvShow.File.Name }.ToUrl(HttpMethods.Get, EndpointHost.Config.DefaultContentType.ToContentFormat());
+				<tr>
+					<td>@tvShow.EpisodeNumber</td>
+					<td>@tvShow.Name</td>
+					<td>@tvShow.ReleaseDate.ToString("ddd, dd/MM/yyyy")</td>
+					<td>
+						<a target="_blank" href="@tvShowUrl">Watch</a>
+					</td>
+				</tr>
+			}
+			</tbody>
+		</table>
 		}
 	</div>
 	<div class="span4">
