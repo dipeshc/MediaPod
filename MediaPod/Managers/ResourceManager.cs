@@ -21,7 +21,7 @@ namespace MediaPod.Managers
 
 		private static Thread _keepAliveThread;
 		private static Thread _fileSystemReloaderThread;
-		private static Thread _webServerThread;
+		private static Thread _webserverThread;
 		private const int _keepAliveSleepTime = 1000 * 5; // 5sec.
 		private const int _fileSystemReloaderSleepTime = 1000 * 10; // 10sec.
 
@@ -53,16 +53,16 @@ namespace MediaPod.Managers
 					_fileSystemReloaderThread.Priority = ThreadPriority.Lowest;
 					_fileSystemReloaderThread.Start();
 				}
-				if(_webServerThread==null || !_webServerThread.IsAlive)
+				if(_webserverThread==null || !_webserverThread.IsAlive)
 				{
-					_webServerThread = new Thread(() =>
+					_webserverThread = new Thread(() =>
 					{
 						// Run webserver and block from terminating.
 						WebserverManager.Run();
 						System.Threading.Thread.Sleep(System.Threading.Timeout.Infinite);
 					});
-					_webServerThread.Priority = ThreadPriority.Normal;
-					_webServerThread.Start();
+					_webserverThread.Priority = ThreadPriority.Normal;
+					_webserverThread.Start();
 				}
 			}, _keepAliveSleepTime);
 			
