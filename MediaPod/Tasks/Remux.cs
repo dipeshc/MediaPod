@@ -142,42 +142,6 @@ namespace MediaPod.Tasks
 			maps.AppendFormat(" -map 0:{0} ", stream.Id);
 			codecs.AppendFormat(" -c:{0} copy ", outputStreamIndex);
 		}
-
-		private IEnumerable<FileInfoBase> ExtractAudio(IEnumerable<MediaStreamsExtractor.IAudioStream> inputStreams, FileInfoBase inputFile, IFileSystem fileSystem, DirectoryInfoBase workingArea, MediaStreamsExtractor.CodecType codec, int channels)
-		{
-			// Find target streams.
-			var targetStreams = inputStreams.Where(stream => stream.Codec == codec && stream.Channels == channels);
-
-			// If no streams found, then extract from best audio.
-			if (!targetStreams.Any ())
-			{
-				// Make temp audio file.
-				var name = string.Format("{0}.{1}.{2}", inputFile.Name, 0, codec);
-				var workingAreaAudioFile = fileSystem.FileInfo.FromFileName(fileSystem.Path.Combine(workingArea.FullName, name));
-				
-				// Make best audio.
-				var arguments = string.Format("-i \"{0}\" -y -c:a {1} -ac:a:0 {2} \"{3}\"", inputFile.FullName, codec.ToString().ToLower(), channels, workingAreaAudioFile.FullName);
-				External.Run(MediaPod.Externals.External.Application.FFmpeg, arguments, StdOut, StdErr);
-
-				// Return audio file.
-				return new List<FileInfoBase> { workingAreaAudioFile };
-			}
-
-			// Copy existing stream.
-			return targetStreams.Select(stream =>
-			{
-				// Make temp audio file.
-				var name = string.Format("{0}.{1}.{2}", inputFile.Name, stream.Id, codec);
-				var workingAreaAudioFile = fileSystem.FileInfo.FromFileName(fileSystem.Path.Combine(workingArea.FullName, name));
-				
-				// Extract audio.
-				var arguments = string.Format("-i \"{0}\" -y -c:{1} copy \"{2}\"", inputFile.FullName, stream.Id, workingAreaAudioFile.FullName);
-				External.Run(External.Application.FFmpeg, arguments, StdOut, StdErr);
-				
-				// Return audio file.
-				return workingAreaAudioFile;
-			}).ToList();
-		}
 	}
 }
 
