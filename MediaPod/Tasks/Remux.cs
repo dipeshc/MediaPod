@@ -35,7 +35,7 @@ namespace MediaPod.Tasks
 				// Make working area file.
 				var name = outputFile.Name.Replace(outputFile.Extension, "");
 				var name1 = name + ".stage1";
-				if(string.Compare(outputFile.Extension, ".M4V", System.StringComparison.OrdinalIgnoreCase)==0)
+				if(string.Compare(outputFile.Extension, ".m4v", System.StringComparison.OrdinalIgnoreCase)==0)
 				{
 					name1 += ".mp4";
 				}
@@ -110,8 +110,16 @@ namespace MediaPod.Tasks
 					codecs.AppendFormat(" -c:{0} mov_text ", outputStreamIndex++);
 				});
 
+				// Mov atom detils.
+				var movFlags = "";
+				if(string.Compare(outputFile.Extension, ".m4v", System.StringComparison.OrdinalIgnoreCase)==0
+				   || string.Compare(outputFile.Extension, ".mp4", System.StringComparison.OrdinalIgnoreCase)==0)
+				{
+					movFlags = " -movflags faststart ";
+				}
+
 				// Remux.
-				var remuxArguments = string.Format("-i \"{0}\" -y -strict experimental {1} {2} \"{3}\"", inputFile.FullName, maps, codecs, workingAreaStage1File.FullName);
+				var remuxArguments = string.Format("-i \"{0}\" -y -strict experimental {1} {2} {3} \"{4}\"", inputFile.FullName, maps, codecs, movFlags, workingAreaStage1File.FullName);
 				LogOutput("Running FFmpeg with arguments {0}", remuxArguments);
 				External.Run(External.Application.FFmpeg, remuxArguments, StdOut, StdErr);
 
