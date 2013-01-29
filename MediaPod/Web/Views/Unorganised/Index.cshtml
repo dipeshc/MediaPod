@@ -16,9 +16,9 @@
 	<tbody>
 	@foreach(var media in unorganisedMedia)
 	{
-		var metaDataUpdaterUrl = new MetadataUpdaterTVShowRequest() { Path = media.File.FullName }.ToUrl(HttpMethods.Get, EndpointHost.Config.DefaultContentType.ToContentFormat());
+		var metaDataUpdaterUrl = new MetadataUpdaterTVShowRequest() { Path = media.File.ToSiteFilePath() }.ToUrl(HttpMethods.Get, EndpointHost.Config.DefaultContentType.ToContentFormat());
 		<tr>
-			<td>@media.File.FullName</td>
+			<td>@media.File.ToSiteFilePath()</td>
 			<td>
 				<a href="@metaDataUpdaterUrl">Organise</a>
 			</td>

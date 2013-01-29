@@ -17,12 +17,9 @@ namespace MediaPod.Web.Services
 {
 	public class MetadataUpdaterService : BaseService
 	{
-		private static readonly IFileSystem _fileSystem = new FileSystem();
-
 		public object Get(MetadataUpdaterTVShowRequest request)
 		{
-			var path = request.Path.UrlDecode();
-			return RenderViewOptimized ("MetadataUpdater.TVShow", new { File = _fileSystem.FileInfo.FromFileName(path) });
+			return RenderViewOptimized ("MetadataUpdater.TVShow", new { File = request.Path.FromSiteFilePath() });
 		}
 
 		public object Get(MetadataUpdaterTVShowSearchRequest request)
@@ -62,8 +59,7 @@ namespace MediaPod.Web.Services
 
 			public MetadataUpdaterTVShow(MetadataUpdaterTVShowUpdateRequest request)
 			{
-				var path = request.Path.UrlDecode();
-				File = _fileSystem.FileInfo.FromFileName(path);
+				File = request.Path.FromSiteFilePath();
 				Definition = MediaPod.Interfaces.Models.Definition.Unknown;
 				TVShowName = request.TVShowName;
 				SeasonNumber = Convert.ToInt32(request.SeasonNumber);

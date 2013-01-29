@@ -25,7 +25,7 @@
 	}
 	
 	var searchUrl = new MetadataUpdaterTVShowSearchRequest().ToUrl(HttpMethods.Get, EndpointHost.Config.DefaultContentType.ToContentFormat());
-	var updateUrl = new MetadataUpdaterTVShowUpdateRequest() {Path = @file.FullName }.ToUrl(HttpMethods.Post, EndpointHost.Config.DefaultContentType.ToContentFormat());
+	var updateUrl = new MetadataUpdaterTVShowUpdateRequest() {Path = @file.ToSiteFilePath() }.ToUrl(HttpMethods.Post, EndpointHost.Config.DefaultContentType.ToContentFormat());
 }
 <script>
 	$(document).ready(function()
@@ -122,7 +122,7 @@
 <div class="row">
 	<h2>MetaData Updater</h2>
 	<div class="row">
-		<h5 class="span6">@file.FullName</h5>
+		<h5 class="span6">@file.ToSiteFilePath()</h5>
 		<button class="offset4 span2 save">Save Updates</button>
 	</div>
 	<div class="search span6">
