@@ -20,7 +20,7 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <Externalconsole>True</Externalconsole>
-    <Commandlineparameters>-p 8888 --tvShowDictionary /Users/Dipesh/Media/TV\ Shows --unorganisedMediaDictionary /Users/Dipesh/Media/RAW -k 416920BF8A4C278C</Commandlineparameters>
+    <Commandlineparameters>-p 8888 --tvShowDictionary /Users/Dipesh/Media/TV\ Shows --unorganisedMediaDictionary /Users/Dipesh/Media/RAW -k 416920BF8A4C278C -l /Users/Dipesh/Desktop</Commandlineparameters>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>none</DebugType>
@@ -111,6 +111,7 @@
     <Compile Include="Extractors\TVShowFilenameRegexExtractor.cs" />
     <Compile Include="Interfaces\ITVShowMetadataSource.cs" />
     <Compile Include="Managers\QueuedTaskManager.cs" />
+    <Compile Include="Managers\LogManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

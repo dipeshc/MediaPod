@@ -28,10 +28,11 @@ namespace MediaPod.Tasks
 			StdErr = stdErr;
 			if (StdOut == null || StdErr == null)
 			{
-				StdOut = Console.Out;
-				StdErr = Console.Error;
+				_managedLog = ResourceManager.LogManager.GetStdOutLog();
+				StdOut = _managedLog;
+				StdErr = _managedLog;
 			}
-			LogOutput("Created at {0}", Created.ToString("o"));
+			LogOutput("Created.");
 		}
 
 		public void Invoke()

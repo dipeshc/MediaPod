@@ -12,11 +12,11 @@ namespace MediaPod.Managers
 {
 	public static class ResourceManager
 	{
-		public static QueuedTaskManager QueuedTaskManager;
-		public static UnorganisedLibrary UnorganisedLibrary;
-		public static TVShowLibrary TVShowLibrary;
+		public static LogManager LogManager;
 		public static ITVShowMetadataSource MetadataSource;
-		public static UnorganisedLibrary UnorganisedLibraryLibrary;
+		public static QueuedTaskManager QueuedTaskManager;
+		public static TVShowLibrary TVShowLibrary;
+		public static UnorganisedLibrary UnorganisedLibrary;
 		public static WebserverManager WebserverManager;
 
 		private static Thread _keepAliveThread;
@@ -25,22 +25,27 @@ namespace MediaPod.Managers
 		private const int _keepAliveSleepTime = 1000 * 5; // 5sec.
 		private const int _fileSystemReloaderSleepTime = 1000 * 10; // 10sec.
 
-		public static void Initialise(IFileSystem fileSystem, int webserverPort, DirectoryInfoBase tvShowDictionary, DirectoryInfoBase unorganisedDictionary, string tvdbApiKey)
+		public static void Initialise(IFileSystem fileSystem, int webserverPort, DirectoryInfoBase tvShowDirectory, DirectoryInfoBase unorganisedDirectory, string tvdbApiKey, DirectoryInfoBase logDirectory=null)
 		{
-			// Make sources.
-			var metadataSource = new TVDBTVShowMetadataSource(fileSystem, tvdbApiKey);
-			MetadataSource = metadataSource;
-			var metadataSources = new List<ITVShowMetadataSource>() { metadataSource };
-
 			// Initalise.
+			if (logDirectory == null)
+			{
+				LogManager = new LogManager(Console.Out, Console.Error);
+			}
+			else
+			{
+				LogManager = new LogManager (fileSystem, logDirectory);
+			}
+			MetadataSource = new TVDBTVShowMetadataSource(fileSystem, tvdbApiKey);
 			QueuedTaskManager = new QueuedTaskManager();
-			UnorganisedLibrary = new UnorganisedLibrary(unorganisedDictionary);
-			TVShowLibrary = new TVShowLibrary(tvShowDictionary, metadataSources);
+			TVShowLibrary = new TVShowLibrary(tvShowDirectory, new List<ITVShowMetadataSource>() { MetadataSource });
+			UnorganisedLibrary = new UnorganisedLibrary(unorganisedDirectory);
 			WebserverManager = new WebserverManager(webserverPort);
 
+			// Sta
 			QueuedTaskManager.Start();
 
-			// Setup reloads.
+			// Setup keep alive thread..
 			_keepAliveThread = CreateIntervalThread(() =>
 			{
 				// Create threads if not alive.

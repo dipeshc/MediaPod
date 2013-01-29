@@ -14,42 +14,47 @@ namespace MediaPod
 		public static void Main(string[] args)
 		{
 			// Run the command for the console input.
-			ConsoleCommandDispatcher.DispatchCommand(ConsoleCommandDispatcher.FindCommandsInSameAssemblyAs(typeof(Program)), args, System.Console.Out);
+			ConsoleCommandDispatcher.DispatchCommand(ConsoleCommandDispatcher.FindCommandsInSameAssemblyAs(typeof(Program)), args, Console.Out);
 		}
 	}
 
 	public class RunCommand : ConsoleCommand
 	{
-		private static IFileSystem _fileSystem = new FileSystem();
-
-		private int webserverPort;
-		private DirectoryInfoBase tvShowDictionary = null;
-		private DirectoryInfoBase unorganisedMediaDictionary = null;
-		private string tvdbApiKey;
+		private IFileSystem _fileSystem = new FileSystem();
+		private int _webserverPort;
+		private DirectoryInfoBase _tvShowDirectory = null;
+		private DirectoryInfoBase _unorganisedMediaDirectory = null;
+		private string _tvdbApiKey;
+		private DirectoryInfoBase _logDirectory = null;
 
 		public RunCommand()
 		{
 			IsCommand("run", "Run MediaPod.");
-			HasRequiredOption("p|port=", "The port on which the MediaPod's webserver will list.", a => webserverPort = int.Parse(a));
-			HasRequiredOption("t|tvShowDictionary=", "The directory for the TV Show library.", a => tvShowDictionary = _fileSystem.DirectoryInfo.FromDirectoryName(a));
-			HasRequiredOption("u|unorganisedMediaDictionary=", "The directory where unorganised media can be found.", a => unorganisedMediaDictionary = _fileSystem.DirectoryInfo.FromDirectoryName(a));
-			HasRequiredOption("k|tvdbApiKey=", "The ApiKey to use when connecting to the TVDB.", a => tvdbApiKey = a);
+			HasRequiredOption("p|port=", "The port on which the MediaPod's webserver will list.", a => _webserverPort = int.Parse(a));
+			HasRequiredOption("t|tvShowDictionary=", "The directory for the TV Show library.", a => _tvShowDirectory = _fileSystem.DirectoryInfo.FromDirectoryName(a));
+			HasRequiredOption("u|unorganisedMediaDictionary=", "The directory where unorganised media can be found.", a => _unorganisedMediaDirectory = _fileSystem.DirectoryInfo.FromDirectoryName(a));
+			HasRequiredOption("k|tvdbApiKey=", "The ApiKey to use when connecting to the TVDB.", a => _tvdbApiKey = a);
+			HasOption("l|logDirectory=", "The directory to store the logs.", a => _logDirectory = _fileSystem.DirectoryInfo.FromDirectoryName(a));
 		}
 		
 		public override int Run(string[] remainingArguments)
 		{
 			// Check directories exists.
-			if(!tvShowDictionary.Exists)
+			if (!_tvShowDirectory.Exists)
 			{
-				throw new ApplicationException("Invalid tvShowDictionary path provided.");
+				throw new ApplicationException ("Invalid tvShowDictionary provided. Does not exist.");
 			}
-			if(!unorganisedMediaDictionary.Exists)
+			if (!_unorganisedMediaDirectory.Exists)
 			{
-				throw new ApplicationException("Invalid unorganisedMediaDictionary directory provided.");
+				throw new ApplicationException ("Invalid unorganisedMediaDictionary provided. Does not exist.");
+			}
+			if (_logDirectory != null && !_logDirectory.Exists)
+			{
+				throw new ApplicationException ("Invalid logDirectory provided. Does not exist.");
 			}
 
 			// Initialise.
-			ResourceManager.Initialise(_fileSystem, webserverPort, tvShowDictionary, unorganisedMediaDictionary, tvdbApiKey);
+			ResourceManager.Initialise(_fileSystem, _webserverPort, _tvShowDirectory, _unorganisedMediaDirectory, _tvdbApiKey, _logDirectory);
 
 			// Retun 0.
 			return 0;
