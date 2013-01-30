@@ -97,7 +97,6 @@
     <Compile Include="Externals\External.cs" />
     <Compile Include="Tasks\RemuxEncodeMetadataAndAddToLibrary.cs" />
     <Compile Include="Tasks\BaseTask.cs" />
-    <Compile Include="Web\Routes\QueueRoutes.cs" />
     <Compile Include="Interfaces\ITask.cs" />
     <Compile Include="Interfaces\Models\ITVShow.cs" />
     <Compile Include="Interfaces\Models\ITVShowCollection.cs" />
@@ -112,6 +111,10 @@
     <Compile Include="Interfaces\ITVShowMetadataSource.cs" />
     <Compile Include="Managers\QueuedTaskManager.cs" />
     <Compile Include="Managers\LogManager.cs" />
+    <Compile Include="Managers\NotificationManager.cs" />
+    <Compile Include="Interfaces\INotification.cs" />
+    <Compile Include="Web\Routes\NotificationRoutes.cs" />
+    <Compile Include="Web\Services\NotificationService.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

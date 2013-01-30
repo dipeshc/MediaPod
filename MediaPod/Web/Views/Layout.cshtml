@@ -1,3 +1,9 @@
+@using MediaPod.Interfaces;
+@using MediaPod.Web.Routes;
+@using ServiceStack.ServiceClient.Web;
+@{
+	var notificationUrl = new NotificationsRequest().ToUrl("GET");
+}
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -6,6 +12,45 @@
 		<link href="/static/font-awesome.css" rel="stylesheet">
 		<script src="/static/jquery-1.8.3.min.js"></script>
 		<script src="/static/bootstrap/js/bootstrap.min.js"></script>
+		<script>
+			$(document).ready(function()
+			{
+				var $notifications = $(".notifications");
+				var intervalDuration = 5000; //5seconds.
+				setInterval(function()
+				{
+					$.ajax(
+					{
+						url : "@notificationUrl?format=json",
+						type : "GET",
+						success : function(notifications)
+						{
+							$notifications.html("");
+							for(var i=0; i!=notifications.length; ++i)
+							{
+								var notification = notifications[i];
+								var status = "alert alert-block";
+								switch(notification.Type)
+								{
+									case "@NotificationType.Success.ToString()":
+										status += " alert-success";
+										break;
+									case "@NotificationType.Error.ToString()":
+										status += " alert-error";
+										break;
+									case "@NotificationType.Informational.ToString()":
+										status += " alert-info";
+										break;
+								}
+								var message = "<strong>" + notification.Heading + "</strong><br />" + notification.Message;
+								var $notification = $("<div></div>").attr("class", status).html(message);
+								$notifications.append($notification);
+							}
+						}
+					});
+				}, intervalDuration);
+			});
+		</script>
 	</head>
 	<body>
 		<div class="container">
