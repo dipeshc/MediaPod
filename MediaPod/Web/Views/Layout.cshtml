@@ -17,7 +17,8 @@
 			{
 				var $notifications = $(".notifications");
 				var intervalDuration = 5000; //5seconds.
-				setInterval(function()
+				
+				var loadNotifications = function()
 				{
 					$.ajax(
 					{
@@ -48,14 +49,17 @@
 							}
 						}
 					});
-				}, intervalDuration);
+				};
+				
+				loadNotifications();
+				setInterval(loadNotifications, intervalDuration);
 			});
 		</script>
 	</head>
 	<body>
 		<div class="container">
-			<div class="notifications"></div>
 			@RenderBody()
 		</div>
+		<div class="notifications" style="position:absolute;right:0px;top:0px;bottom:0px;width:256px;"></div>
 	</body>
 </html>
