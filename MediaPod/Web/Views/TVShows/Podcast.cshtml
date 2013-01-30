@@ -12,7 +12,7 @@
 	var tvShowCollection = (ITVShowCollection) @Model.TVShowCollection;
 	var firstTVShowInCollection = tvShowCollection.First();
 	
-	var tvShowCollectionUrl = new TVShowRequest() {TVShowName = firstTVShowInCollection.TVShowName }.ToUrl(HttpMethods.Get, EndpointHost.Config.DefaultContentType.ToContentFormat());
+	var tvShowCollectionUrl = new TVShowRequest() {TVShowName = firstTVShowInCollection.TVShowName }.ToAbsoluteUri(null, null, (IHttpRequest) @Model.CurrentRequest);
 	var tvShowCollectionCoverImage = firstTVShowInCollection.Artwork==null ? "" : firstTVShowInCollection.Artwork.ToWebImage();
 	
 	var TTL = 1440;
@@ -23,15 +23,15 @@
 	<channel>
 		<title>@firstTVShowInCollection.TVShowName</title>
 		<link>@tvShowCollectionUrl</link>
-		<language>en</language>
-		<copyright>a</copyright>
-		<itunes:author>a</itunes:author>
+		<language></language>
+		<copyright></copyright>
+		<itunes:author></itunes:author>
 		<itunes:owner>
 			<itunes:name>@ViewBag.OwnerName</itunes:name>
 			<itunes:email>@ViewBag.OwnerEmail</itunes:email>
 		</itunes:owner>
-		<itunes:summary>aa</itunes:summary>
-		<description>aa</description>
+		<itunes:summary></itunes:summary>
+		<description></description>
 		<itunes:image href="@tvShowCollectionCoverImage" />
 		<itunes:category text="TV Show" />
 		<ttl>@TTL</ttl>
@@ -46,11 +46,11 @@
 			Name += " - " + tvShow.Name;
 			<item>
 				<title>@Name</title>
-				<author>a</author>
-				<itunes:author>a</itunes:author>
+				<author></author>
+				<itunes:author></itunes:author>
 				<itunes:subtitle></itunes:subtitle>
 				<itunes:summary>@tvShow.Description</itunes:summary>
-				@*<itunes:image href="" />*@
+				<itunes:image href="@tvShowCollectionCoverImage" />
 				<link>@tvShowCollectionUrl</link>
 				<description>@tvShow.Description</description>
 				@if(tvShow.File!=null)
