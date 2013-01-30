@@ -16,6 +16,7 @@ namespace MediaPod.Interfaces
 		string Heading { get; }
 		string Message { get; }
 		NotificationType Type { get; }
+		DateTime Created { get; }
 		bool IsSeen { get; }
 		bool HasExpired { get; }
 

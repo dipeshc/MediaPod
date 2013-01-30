@@ -19,6 +19,8 @@ namespace MediaPod.Web.Services
 {
 	public class MetadataUpdaterService : BaseService
 	{
+		private static int _notificationCount = 0;
+
 		public object Get(MetadataUpdaterTVShowRequest request)
 		{
 			return RenderViewOptimized ("MetadataUpdater.TVShow", new { File = request.Path.FromSiteFilePath() });
@@ -38,28 +40,28 @@ namespace MediaPod.Web.Services
 			// Create notifications.
 			var notificationQueued = new Notification()
 			{
-				Id = "",
+				Id = string.Format("MetadataUpdaterRequest{0}", _notificationCount++),
 				Heading = "Metadata Updater Request Queued",
 				Message = string.Format("Queued metadata update on file {0}", request.Path.UrlDecode()),
 				Type = NotificationType.Informational
 			};
 			var notificationStarted = new Notification()
 			{
-				Id = "",
+				Id = string.Format("MetadataUpdaterRequest{0}", _notificationCount++),
 				Heading = "Metadata Updater Request Started",
 				Message = string.Format("Started metadata update on file {0}", request.Path.UrlDecode()),
-				Type = NotificationType.Informational
+				Type = NotificationType.Warning
 			};
 			var notificationCompleted = new AutoExpireNotification(new TimeSpan(0, 0, 30))
 			{
-				Id = "",
+				Id = string.Format("MetadataUpdaterRequest{0}", _notificationCount++),
 				Heading = "Metadata Updater Request Completed",
 				Message = string.Format("Completed metadata update on file {0}", request.Path.UrlDecode()),
 				Type = NotificationType.Success
 			};
 			var notificationError = new AutoExpireNotification(new TimeSpan(0, 2, 0))
 			{
-				Id = "",
+				Id = string.Format("MetadataUpdaterRequest{0}", _notificationCount++),
 				Heading = "Metadata Updater Request Errored",
 				Message = string.Format("Error occured during metadata update on file {0}", request.Path.UrlDecode()),
 				Type = NotificationType.Error
@@ -70,24 +72,24 @@ namespace MediaPod.Web.Services
 			task.PreInvokeHandle = () =>
 			{
 				notificationQueued.HasExpired = true;
-				ResourceManager.NotificationManager.NewNotification(notificationStarted);
+				ResourceManager.NotificationManager.Add(notificationStarted);
 			};
 			task.PostInvokeHandle = () =>
 			{
 				notificationQueued.HasExpired = true;
 				notificationStarted.HasExpired = true;
 				notificationError.HasExpired = true;
-				ResourceManager.NotificationManager.NewNotification(notificationCompleted);
+				ResourceManager.NotificationManager.Add(notificationCompleted);
 			};
 			task.InvokeErrorHandle = () =>
 			{
 				notificationQueued.HasExpired = true;
 				notificationStarted.HasExpired = true;
 				notificationCompleted.HasExpired = true;
-				ResourceManager.NotificationManager.NewNotification(notificationError);
+				ResourceManager.NotificationManager.Add(notificationError);
 			};
 			ResourceManager.QueuedTaskManager.Enqueue(task);
-			ResourceManager.NotificationManager.NewNotification(notificationQueued);
+			ResourceManager.NotificationManager.Add(notificationQueued);
 
 			// Return null.
 			return null;
@@ -151,11 +153,13 @@ namespace MediaPod.Web.Services
 			public string Heading { get; set; }
 			public string Message { get; set; }
 			public NotificationType Type { get; set; }
+			public DateTime Created { get; set; }
 			public bool IsSeen { get; set; }
 			public bool HasExpired { get; set; }
 
 			public Notification()
 			{
+				Created = DateTime.Now;
 				IsSeen = false;
 				HasExpired = false;
 			}

@@ -1,17 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using MediaPod.Interfaces;
 
 namespace MediaPod.Managers
 {
 	public class NotificationManager
 	{
-		private readonly List<INotification> _notifications;
+		private List<INotification> _notifications;
 		public IEnumerable<INotification> Notifications
 		{
 			get
 			{
-				Clean();
+				Maintenance();
 				return _notifications;
 			}
 		}
@@ -21,19 +22,25 @@ namespace MediaPod.Managers
 			_notifications = new List<INotification>();
 		}
 
-		public void NewNotification(INotification notification)
+		public void Add(INotification notification)
 		{
-			// Do clean.
-			Clean();
-
 			// Add new.
 			_notifications.Add(notification);
+
+			// Maintenance.
+			Maintenance();
 		}
 
-		private void Clean()
+		private void Maintenance()
 		{
-			// Remove all expired.
-			_notifications.RemoveAll(n => n.HasExpired);
+			lock (_notifications)
+			{
+				// Remove all expired.
+				_notifications.RemoveAll (n => n.HasExpired);
+
+				// Sort.
+				_notifications = _notifications.OrderBy (notification => notification.Created).ToList ();
+			}
 		}
 	}
 }
