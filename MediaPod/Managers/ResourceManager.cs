@@ -13,6 +13,7 @@ namespace MediaPod.Managers
 	public static class ResourceManager
 	{
 		public static LogManager LogManager;
+		public static NotificationManager NotificationManager;
 		public static ITVShowMetadataSource MetadataSource;
 		public static QueuedTaskManager QueuedTaskManager;
 		public static TVShowLibrary TVShowLibrary;
@@ -36,6 +37,7 @@ namespace MediaPod.Managers
 			{
 				LogManager = new LogManager (fileSystem, logDirectory);
 			}
+			NotificationManager = new NotificationManager();
 			MetadataSource = new TVDBTVShowMetadataSource(fileSystem, tvdbApiKey);
 			QueuedTaskManager = new QueuedTaskManager();
 			TVShowLibrary = new TVShowLibrary(tvShowDirectory, new List<ITVShowMetadataSource>() { MetadataSource });
