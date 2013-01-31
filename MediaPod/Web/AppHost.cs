@@ -18,15 +18,26 @@ namespace MediaPod.Web
 		
 		public override void Configure(Container container)
 		{
+			// Enable debug.
+			SetConfig(new EndpointHostConfig { DebugMode = true, WriteErrorsToResponse=true });
+
 			// Enable caching.
 			container.Register<ICacheClient>(new MemoryCacheClient());
 
 			// Setup razor.
-			string viewPathTemplate = "MediaPod.Web.Views.{0}";
 			TemplateServiceConfiguration templateConfig = new TemplateServiceConfiguration();
 			templateConfig.Resolver = new DelegateTemplateResolver(name =>
-			                                                       {
-				string resourcePath = string.Format(viewPathTemplate, name);
+			{
+				var resourcePath = "";
+				if(!name.StartsWith("MediaPod."))
+				{
+					resourcePath = string.Format("MediaPod.Web.Views.{0}", name);
+				}
+				else
+				{
+					resourcePath = name;
+				}
+
 				if(!resourcePath.EndsWith(".cshtml"))
 				{
 					resourcePath += ".cshtml";
@@ -38,6 +49,9 @@ namespace MediaPod.Web
 				}
 			});
 			Razor.SetTemplateService(new TemplateService(templateConfig));
+
+			// Register custom formats.
+			MediaPod.Api.CustomFormats.PodcastFormat.Register(this);
 		}
 	}
 }

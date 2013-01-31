@@ -1,0 +1,68 @@
+@using System;
+@using System.IO.Abstractions;
+@using MediaPod.Interfaces.Models;
+@using MediaPod.Web.Extensions;
+@using MediaPod.Web.Routes;
+@using MediaPod.Web.Services;
+@using ServiceStack.Common.Web;
+@using ServiceStack.ServiceClient.Web;
+@using ServiceStack.ServiceHost;
+@using ServiceStack.WebHost.Endpoints;
+@{
+	var tvShowCollection = (ITVShowCollection) @Model.TVShowCollection;
+	var firstTVShowInCollection = tvShowCollection.First();
+	
+	var tvShowCollectionUrl = new TVShowRequest() {TVShowName = firstTVShowInCollection.TVShowName }.ToAbsoluteUri(null, null, (IHttpRequest) @Model.CurrentRequest);
+	var tvShowCollectionCoverImage = firstTVShowInCollection.Artwork==null ? "" : firstTVShowInCollection.Artwork.ToWebImage();
+	
+	var TTL = 1440;
+}
+<?xml version="1.0" encoding="utf-8"?>
+<!-- generator="MediaPod/1.1" -->
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
+	<channel>
+		<title>@firstTVShowInCollection.TVShowName</title>
+		<link>@tvShowCollectionUrl</link>
+		<language></language>
+		<copyright></copyright>
+		<itunes:author></itunes:author>
+		<itunes:owner>
+			<itunes:name>@ViewBag.OwnerName</itunes:name>
+			<itunes:email>@ViewBag.OwnerEmail</itunes:email>
+		</itunes:owner>
+		<itunes:summary></itunes:summary>
+		<description></description>
+		<itunes:image href="@tvShowCollectionCoverImage" />
+		<itunes:category text="TV Show" />
+		<ttl>@TTL</ttl>
+		@foreach(var tvShow in tvShowCollection)
+		{
+			var Name = "";
+			if(tvShow.SeasonNumber.HasValue)
+			{
+				Name += String.Format("S{0:D2}", tvShow.SeasonNumber); 
+			}
+			Name += String.Format("E{0:D2}", tvShow.EpisodeNumber);
+			Name += " - " + tvShow.Name;
+			<item>
+				<title>@Name</title>
+				<author></author>
+				<itunes:author></itunes:author>
+				<itunes:subtitle></itunes:subtitle>
+				<itunes:summary>@tvShow.Description</itunes:summary>
+				<itunes:image href="@tvShowCollectionCoverImage" />
+				<link>@tvShowCollectionUrl</link>
+				<description>@tvShow.Description</description>
+				@if(tvShow.File!=null)
+				{
+				var tvShowUrl = new TVShowFileRequest() {TVShowName = tvShow.TVShowName, SeasonNumber=tvShow.SeasonNumber, EpisodeNumber=tvShow.EpisodeNumber, FileName=tvShow.File.Name }.ToAbsoluteUri(null, null, (IHttpRequest) @Model.CurrentRequest);
+				<enclosure url="@tvShowUrl" length="@tvShow.File.Length" type="video/mpeg" />
+				<guid>@tvShowUrl</guid>
+				}
+				<pubDate>@tvShow.ReleaseDate.ToString("r")</pubDate>
+				<itunes:duration></itunes:duration>
+				<itunes:keywords></itunes:keywords>
+			</item>
+		}
+	</channel>
+</rss>

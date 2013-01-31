@@ -56,7 +56,7 @@ namespace MediaPod.Libraries
 				// Add to mappings.
 				if(!mappings.ContainsKey(tvShow.TVShowName))
 				{
-					mappings [tvShow.TVShowName] = new TVShowCollection ();
+					mappings [tvShow.TVShowName] = new TVShowCollection (tvShow.TVShowName);
 				}
 				mappings [tvShow.TVShowName].Add(tvShow);
 			});
@@ -102,6 +102,13 @@ namespace MediaPod.Libraries
 
 		private class TVShowCollection : List<ITVShow>, ITVShowCollection
 		{
+			public string TVShowName { get; private set; }
+
+			public TVShowCollection(string tvShowName)
+			{
+				TVShowName = tvShowName;
+			}
+
 			public ITVShow GetTVShowBySeasonAndEpisode(int? seasonNumber, int episodeNumber)
 			{
 				return this.FirstOrDefault(tvShow => tvShow.SeasonNumber == seasonNumber && tvShow.EpisodeNumber == episodeNumber);

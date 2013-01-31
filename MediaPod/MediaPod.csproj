@@ -115,6 +115,9 @@
     <Compile Include="Interfaces\INotification.cs" />
     <Compile Include="Web\Routes\NotificationRoutes.cs" />
     <Compile Include="Web\Services\NotificationService.cs" />
+    <Compile Include="Api\CustomFormats\PodcastFormats.cs" />
+    <Compile Include="Api\Services\TVShowService.cs" />
+    <Compile Include="Api\Extensions\ApiFileExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -133,6 +136,10 @@
     <Folder Include="Interfaces\Models\" />
     <Folder Include="Sources\" />
     <Folder Include="Libraries\" />
+    <Folder Include="Api\" />
+    <Folder Include="Api\CustomFormats\" />
+    <Folder Include="Api\Services\" />
+    <Folder Include="Api\Extensions\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Web\Views\Layout.cshtml" />
@@ -152,6 +159,7 @@
     <EmbeddedResource Include="Web\Views\MetadataUpdater\TVShowSearchResults.cshtml" />
     <EmbeddedResource Include="Externals\SublerCLI" />
     <EmbeddedResource Include="Externals\FFmpeg" />
+    <EmbeddedResource Include="Api\CustomFormats\TVShowPodcast.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
