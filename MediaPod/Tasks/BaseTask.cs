@@ -18,6 +18,10 @@ namespace MediaPod.Tasks
 		public DateTime Started { get; protected set; }
 		public DateTime Ended { get; protected set; }
 
+		public Action PreInvokeHandle { get; set; }
+		public Action PostInvokeHandle { get; set; }
+		public Action InvokeErrorHandle { get; set; }
+
 		private TextWriter _managedLog;
 
 		protected BaseTask (string id, TextWriter stdOut=null, TextWriter stdErr=null)
@@ -37,16 +41,46 @@ namespace MediaPod.Tasks
 
 		public void Invoke()
 		{
-			LogOutput ("Started");
-			Started = DateTime.UtcNow;
-			HasStarted = true;
-			_action.Invoke ();
-			Ended = DateTime.UtcNow;
-			LogOutput ("Completed");
-
-			if (_managedLog != null)
+			try
 			{
-				_managedLog.Close();
+				LogOutput ("Started.");
+				Started = DateTime.UtcNow;
+				HasStarted = true;
+
+				if (PreInvokeHandle != null)
+				{
+					LogOutput ("PreInvokeHandle action found. Executing.");
+					PreInvokeHandle.Invoke ();
+				}
+
+				_action.Invoke ();
+				
+				if (PostInvokeHandle != null)
+				{
+					LogOutput ("PostInvokeHandle action found. Executing.");
+					PostInvokeHandle.Invoke ();
+				}
+			}
+			catch (Exception e)
+			{
+				LogOutput ("Invoke failed.");
+
+				if (InvokeErrorHandle != null)
+				{
+					LogOutput ("InvokeErrorHandle action found. Executing.");
+					InvokeErrorHandle.DynamicInvoke (e);
+				}
+			}
+			finally
+			{
+				Ended = DateTime.UtcNow;
+				LogOutput ("Completed.");
+
+				// Close log.
+				if (_managedLog != null)
+				{
+					_managedLog.Close ();
+				}
 			}
 		}
 

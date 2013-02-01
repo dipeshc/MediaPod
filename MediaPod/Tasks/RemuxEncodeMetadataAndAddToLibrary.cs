@@ -31,10 +31,6 @@ namespace MediaPod.Tasks
 				// Make working area tvShow.
 				var workingAreaTVShow = new WorkingTVShow(tvShow, workingAreaFile);
 
-				// Copy file to working area.
-				//LogOutput("Copying file {0} to working area {1}.", tvShow.File.FullName, workingAreaFile.FullName);
-				//tvShow.File.CopyTo(workingAreaFile.FullName, true);
-
 				// Remux.
 				var remuxTask = new Remux(fileSystem, tvShow.File, workingAreaFile, StdOut, StdErr);
 				LogOutput("Starting remux sub-task {0}.", remuxTask.Id);

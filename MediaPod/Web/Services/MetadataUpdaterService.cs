@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
-using System.Globalization;
+using System.Threading;
 using MediaPod.Extractors;
+using MediaPod.Interfaces;
 using MediaPod.Interfaces.Models;
 using MediaPod.Managers;
 using MediaPod.Model.Extensions;
@@ -17,6 +19,8 @@ namespace MediaPod.Web.Services
 {
 	public class MetadataUpdaterService : BaseService
 	{
+		private static int _notificationCount = 0;
+
 		public object Get(MetadataUpdaterTVShowRequest request)
 		{
 			return RenderViewOptimized ("MetadataUpdater.TVShow", new { File = request.Path.FromSiteFilePath() });
@@ -33,8 +37,59 @@ namespace MediaPod.Web.Services
 			// Convert the request to a tvshow.
 			var tvShow = new MetadataUpdaterTVShow(request);
 
+			// Create notifications.
+			var notificationQueued = new Notification()
+			{
+				Id = string.Format("MetadataUpdaterRequest{0}", _notificationCount++),
+				Heading = "Metadata Updater Request Queued",
+				Message = string.Format("Queued metadata update on file {0}", request.Path.UrlDecode()),
+				Type = NotificationType.Informational
+			};
+			var notificationStarted = new Notification()
+			{
+				Id = string.Format("MetadataUpdaterRequest{0}", _notificationCount++),
+				Heading = "Metadata Updater Request Started",
+				Message = string.Format("Started metadata update on file {0}", request.Path.UrlDecode()),
+				Type = NotificationType.Warning
+			};
+			var notificationCompleted = new AutoExpireNotification(new TimeSpan(0, 0, 30))
+			{
+				Id = string.Format("MetadataUpdaterRequest{0}", _notificationCount++),
+				Heading = "Metadata Updater Request Completed",
+				Message = string.Format("Completed metadata update on file {0}", request.Path.UrlDecode()),
+				Type = NotificationType.Success
+			};
+			var notificationError = new AutoExpireNotification(new TimeSpan(0, 2, 0))
+			{
+				Id = string.Format("MetadataUpdaterRequest{0}", _notificationCount++),
+				Heading = "Metadata Updater Request Errored",
+				Message = string.Format("Error occured during metadata update on file {0}", request.Path.UrlDecode()),
+				Type = NotificationType.Error
+			};
+
 			// Create task.
-			ResourceManager.QueuedTaskManager.Enqueue(new RemuxEncodeMetadataAndAddToLibrary(new FileSystem(), tvShow, false));
+			var task = new RemuxEncodeMetadataAndAddToLibrary(new FileSystem(), tvShow, false);
+			task.PreInvokeHandle = () =>
+			{
+				notificationQueued.HasExpired = true;
+				ResourceManager.NotificationManager.Add(notificationStarted);
+			};
+			task.PostInvokeHandle = () =>
+			{
+				notificationQueued.HasExpired = true;
+				notificationStarted.HasExpired = true;
+				notificationError.HasExpired = true;
+				ResourceManager.NotificationManager.Add(notificationCompleted);
+			};
+			task.InvokeErrorHandle = () =>
+			{
+				notificationQueued.HasExpired = true;
+				notificationStarted.HasExpired = true;
+				notificationCompleted.HasExpired = true;
+				ResourceManager.NotificationManager.Add(notificationError);
+			};
+			ResourceManager.QueuedTaskManager.Enqueue(task);
+			ResourceManager.NotificationManager.Add(notificationQueued);
 
 			// Return null.
 			return null;
@@ -89,6 +144,56 @@ namespace MediaPod.Web.Services
 				{
 					Definition = Definition.SD;
 				}
+			}
+		}
+
+		private class Notification : INotification
+		{
+			public string Id { get; set; }
+			public string Heading { get; set; }
+			public string Message { get; set; }
+			public NotificationType Type { get; set; }
+			public DateTime Created { get; set; }
+			public bool IsSeen { get; set; }
+			public bool HasExpired { get; set; }
+
+			public Notification()
+			{
+				Created = DateTime.Now;
+				IsSeen = false;
+				HasExpired = false;
+			}
+
+			public virtual void Seen()
+			{
+				IsSeen = true;
+			}
+		}
+
+		private class AutoExpireNotification : Notification
+		{
+			private TimeSpan _autoExpireDurationUponSeen;
+
+			public AutoExpireNotification(TimeSpan autoExpireDurationUponSeen) : base()
+			{
+				_autoExpireDurationUponSeen = autoExpireDurationUponSeen;
+			}
+
+			public override void Seen()
+			{
+				if (IsSeen)
+				{
+					return;
+				}
+
+				IsSeen = true;
+				var thread = new Thread(() =>
+				{
+					Thread.Sleep(_autoExpireDurationUponSeen);
+					HasExpired = true;
+				});
+				thread.Priority = ThreadPriority.Lowest;
+				thread.Start();
 			}
 		}
 	}
