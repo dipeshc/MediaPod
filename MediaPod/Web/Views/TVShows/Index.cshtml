@@ -1,38 +1,41 @@
-@using System.Collections.Generic;
-@using MediaPod.Interfaces.Models;
-@using MediaPod.Web.Extensions;
-@using MediaPod.Web.Routes;
-@using ServiceStack.Common.Web;
+@using MediaPod.Api.Services;
 @using ServiceStack.ServiceClient.Web;
-@using ServiceStack.WebHost.Endpoints;
 @{
-	_Layout = "Layout";
-	var tvShowCollections = (IEnumerable<ITVShowCollection>) @Model.TVShowCollections;
+	_Layout = "MediaPod.Web.Views.Layout";
+	
+	var tvShowsUrl = new TVShowRequest().ToUrl("GET");
 }
 <script>
 	$(document).ready(function()
 	{
-		$(".mediaThumbnail").click(function()
+		// Main elements.
+		var $tvShowThumbnails = $(".tvShowThumbnails");
+		
+		// Setup elements.
+		$tvShowThumbnails.load(function()
 		{
-			$(".mediaDetails").load($(this).attr("href"));
-			return false;
-		}).first().click();
+			$.ajax(
+			{
+				url : "@tvShowsUrl?format=json",
+				success : function(data)
+				{
+					$tvShowThumbnails.html(data);
+				}
+			});
+		});
+		
+		// Core functionality.
+		var createTVShowThumnail = function()
+		{
+			
+		};
+		
+		// Init.
+		$tvShowThumbnails.load();	
 	});
 </script>
 <div class="row">
 	<h2>TV Shows</h2>
-	<ul class="span12 thumbnails" style="min-height:200px;max-height:460px;overflow:scroll;">
-	@foreach(var tvShowCollection in tvShowCollections)
-	{
-		var firstTVShowInCollection = tvShowCollection.First();
-		var tvShowCollectionUrl = new TVShowRequest() {TVShowName = firstTVShowInCollection.TVShowName }.ToUrl(HttpMethods.Get, EndpointHost.Config.DefaultContentType.ToContentFormat());
-		var tvShowCollectionArtwork = firstTVShowInCollection.Artwork==null ? "" : firstTVShowInCollection.Artwork.ToWebImage();
-		<li>
-			<a href="@tvShowCollectionUrl" class="mediaThumbnail thumbnail">
-				<img data-src="holder.js/180x240" style="width:180px;height:240px;" alt="@firstTVShowInCollection.TVShowName" src="@tvShowCollectionArtwork" />
-			</a>
-		</li>
-	}
-	</ul>
+	<ul class="span12 tvShowThumbnails" style="min-height:200px;max-height:460px;overflow:scroll;"></ul>
 	<div class="mediaDetails span12"></div>
 </div>

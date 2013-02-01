@@ -6,7 +6,7 @@ using System.Threading;
 using MediaPod.Interfaces;
 using MediaPod.Sources;
 using MediaPod.Libraries;
-using MediaPod.Web;
+using MediaPod.Api;
 
 namespace MediaPod.Managers
 {

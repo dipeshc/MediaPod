@@ -1,36 +1,54 @@
-/**
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Threading;
+using MediaPod.Api.Extensions;
 using MediaPod.Extractors;
 using MediaPod.Interfaces;
 using MediaPod.Interfaces.Models;
 using MediaPod.Managers;
-using MediaPod.Model.Extensions;
 using MediaPod.Tasks;
-using MediaPod.Web.Routes;
-using MediaPod.Web.Extensions;
+using ServiceStack.ServiceInterface;
+using ServiceStack.ServiceHost;
 using ServiceStack.Text;
 
-namespace MediaPod.Web.Services
+namespace MediaPod.Api.Services
 {
-	public class MetadataUpdaterService : BaseService
+	[Route("/Api/MetadataUpdater/TVShow/{Path*}", "POST")]
+	public class MetadataUpdaterTVShowUpdateRequest : IReturn
+	{
+		public string Path { get; set; }
+		public string TVShowName { get; set; }
+		public int? SeasonNumber { get; set; }
+		public int EpisodeNumber { get; set; }
+		public string Name { get; set; }
+		public string Description { get; set; }
+		public string Genres { get; set; }
+		public string Cast { get; set; }
+		public string Directors { get; set; }
+		public string Screenwriters { get; set; }
+		public string ReleaseDate { get; set; }
+		public string Network { get; set; }
+		public string Artwork { get; set; }
+	}
+	
+	[Route("/Api/MetaDataUpdater/TVShow/Search", "GET")]
+	public class MetadataUpdaterTVShowSearchRequest : IReturn
+	{
+		public string TVShowName { get; set; }
+		public int? SeasonNumber { get; set; }
+		public int? EpisodeNumber { get; set; }
+	}
+	
+	public class MetadataUpdaterService : Service
 	{
 		private static int _notificationCount = 0;
 
-		public object Get(MetadataUpdaterTVShowRequest request)
-		{
-			return RenderViewOptimized ("MetadataUpdater.TVShow", new { File = request.Path.FromSiteFilePath() });
-		}
-
 		public object Get(MetadataUpdaterTVShowSearchRequest request)
 		{
-			var results = ResourceManager.MetadataSource.Search(request.TVShowName, request.SeasonNumber, request.EpisodeNumber.Value);
-			return RenderViewOptimized ("MetadataUpdater.TVShowSearchResults", new { Results = results });
+			return ResourceManager.MetadataSource.Search(request.TVShowName, request.SeasonNumber, request.EpisodeNumber.Value);
 		}
 
 		public object Post(MetadataUpdaterTVShowUpdateRequest request)
@@ -69,7 +87,7 @@ namespace MediaPod.Web.Services
 			};
 
 			// Create task.
-			var task = new RemuxEncodeMetadataAndAddToLibrary(new FileSystem(), tvShow, false);
+			var task = new RemuxEncodeMetadataAndAddToLibrary(ApiExtensions.FileSystem, tvShow, false);
 			task.PreInvokeHandle = () =>
 			{
 				notificationQueued.HasExpired = true;
@@ -199,4 +217,3 @@ namespace MediaPod.Web.Services
 		}
 	}
 }
-**/

@@ -77,11 +77,9 @@
     <Compile Include="Managers\ResourceManager.cs" />
     <Compile Include="Extensions\TVDBCacheExtensions.cs" />
     <Compile Include="Extensions\XMLSerializerExtensions.cs" />
-    <Compile Include="Web\AppHost.cs" />
     <Compile Include="Web\Services\TVShowService.cs" />
     <Compile Include="Managers\WebserverManager.cs" />
     <Compile Include="Web\Services\StaticService.cs" />
-    <Compile Include="Web\Services\BaseService.cs" />
     <Compile Include="Web\Extensions\WebFileExtensions.cs" />
     <Compile Include="Web\Extensions\RoutingExtensions.cs" />
     <Compile Include="Web\Routes\TVShowRoutes.cs" />
@@ -113,11 +111,12 @@
     <Compile Include="Managers\LogManager.cs" />
     <Compile Include="Managers\NotificationManager.cs" />
     <Compile Include="Interfaces\INotification.cs" />
-    <Compile Include="Web\Routes\NotificationRoutes.cs" />
-    <Compile Include="Web\Services\NotificationService.cs" />
-    <Compile Include="Api\CustomFormats\PodcastFormats.cs" />
     <Compile Include="Api\Services\TVShowService.cs" />
-    <Compile Include="Api\Extensions\ApiFileExtensions.cs" />
+    <Compile Include="Api\Services\MetadataUpdaterService.cs" />
+    <Compile Include="Api\Services\NotificationService.cs" />
+    <Compile Include="Api\Services\UnorganisedService.cs" />
+    <Compile Include="Api\Extensions\ApiExtensions.cs" />
+    <Compile Include="Web\Services\MainService.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -137,7 +136,6 @@
     <Folder Include="Sources\" />
     <Folder Include="Libraries\" />
     <Folder Include="Api\" />
-    <Folder Include="Api\CustomFormats\" />
     <Folder Include="Api\Services\" />
     <Folder Include="Api\Extensions\" />
   </ItemGroup>
@@ -159,7 +157,6 @@
     <EmbeddedResource Include="Web\Views\MetadataUpdater\TVShowSearchResults.cshtml" />
     <EmbeddedResource Include="Externals\SublerCLI" />
     <EmbeddedResource Include="Externals\FFmpeg" />
-    <EmbeddedResource Include="Api\CustomFormats\TVShowPodcast.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

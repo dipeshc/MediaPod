@@ -1,3 +1,4 @@
+/**
 using ServiceStack.ServiceHost;
 
 namespace MediaPod.Web.Routes
@@ -25,3 +26,4 @@ namespace MediaPod.Web.Routes
 		public string FileName { get; set; }
 	}
 }
+**/

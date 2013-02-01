@@ -2,15 +2,21 @@ using System;
 using System.IO;
 using System.Net;
 using System.Reflection;
-using MediaPod.Web.Extensions;
 using MediaPod.Web.Routes;
 using ServiceStack.Common.ServiceModel;
 using ServiceStack.Common.Web;
 using ServiceStack.ServiceHost;
+using ServiceStack.ServiceInterface;
 
 namespace MediaPod.Web.Services
 {	
-	public class StaticService : BaseService
+	[Route("/static/{Path*}")]
+	public class StaticRequest : IReturn
+	{
+		public string Path { get; set; }
+	}
+
+	public class StaticService : Service
 	{
 		public object Get(StaticRequest request)
 		{
@@ -37,7 +43,7 @@ namespace MediaPod.Web.Services
 			});
 
 			// Add headers.
-			response.ContentType = resourcePath.ResoveContentType();
+			response.ContentType = MimeTypes.GetMimeType(resourcePath);
 			Response.AddHeader("Cache-Control", "public");
 			Response.AddHeader("Expires", DateTime.Now.AddYears(1).ToString("ddd, dd MMM yyyy HH:mm:ss 'GMT'"));
 

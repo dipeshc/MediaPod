@@ -1,10 +1,16 @@
 using System.Linq;
 using MediaPod.Managers;
-using MediaPod.Web.Routes;
+using ServiceStack.ServiceHost;
+using ServiceStack.ServiceInterface;
 
-namespace MediaPod.Web.Services
+namespace MediaPod.Api.Services
 {
-	public class NotificationService : BaseService
+	[Route("/Api/Notifications", "GET")]
+	public class NotificationsRequest : IReturn
+	{
+	}
+
+	public class NotificationService : Service
 	{
 		public object Get(NotificationsRequest request)
 		{

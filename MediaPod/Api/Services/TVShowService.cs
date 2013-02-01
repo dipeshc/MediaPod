@@ -1,50 +1,42 @@
-using System;
-using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using MediaPod.Api.Extensions;
-using MediaPod.Interfaces.Models;
 using MediaPod.Managers;
-using ServiceStack.Text;
-
-using RazorEngine;
-using RazorEngine.Templating;
 using ServiceStack.Common.Web;
 using ServiceStack.ServiceHost;
 using ServiceStack.ServiceInterface;
 using ServiceStack.ServiceClient.Web;
-using ServiceStack.WebHost.Endpoints;
-
+using ServiceStack.Text;
 
 namespace MediaPod.Api.Services
 {
+	[Route("/Api/TVShows")]
+	[Route("/Api/TVShows/{TVShowName}")]
+	public class TVShowRequest : IReturn
+	{
+		public string TVShowName { get; set; }
+	}
+	
+	[Route("/Api/TVShows/{TVShowName}/Seasons/{SeasonNumber}/Episodes/{EpisodeNumber}/File/{FileName}")]
+	[Route("/Api/TVShows/{TVShowName}/Episodes/{EpisodeNumber}/File/{FileName}")]
+	public class TVShowFileRequest : IReturn
+	{
+		public string TVShowName { get; set; }
+		public int? SeasonNumber { get; set; }
+		public int EpisodeNumber { get; set; }
+		public string FileName { get; set; }
+	}
+	
+	[Route("/Api/TVShows/{TVShowName}/Artwork.png")]
+	public class TVShowArtworkRequest : IReturn
+	{
+		public string TVShowName { get; set; }
+	}
+
 	public class TVShowService : Service
 	{
-		[Route("/Api/TVShows")]
-		[Route("/Api/TVShows/{TVShowName}")]
-		public class TVShowRequest : IReturn
-		{
-			public string TVShowName { get; set; }
-		}
-
-		[Route("/Api/TVShows/{TVShowName}/Seasons/{SeasonNumber}/Episodes/{EpisodeNumber}/File/{FileName}")]
-		[Route("Api/TVShows/{TVShowName}/Episodes/{EpisodeNumber}/File/{FileName}")]
-		public class TVShowFileRequest : IReturn
-		{
-			public string TVShowName { get; set; }
-			public int? SeasonNumber { get; set; }
-			public int EpisodeNumber { get; set; }
-			public string FileName { get; set; }
-		}
-
-		[Route("/Api/TVShows/{TVShowName}/Artwork.png")]
-		public class TVShowArtworkRequest : IReturn
-		{
-			public string TVShowName { get; set; }
-		}
-
 		public object Get(TVShowRequest request)
 		{
 			// If TVShowName is NOT provided then return link to each collection.
@@ -168,7 +160,7 @@ namespace MediaPod.Api.Services
 			}
 			
 			// Set headers.
-			Response.ContentType = file.Name.ResoveContentType();
+			Response.ContentType = MimeTypes.GetMimeType(file.Name);
 			Response.AddHeader("Accept-Ranges", "bytes");
 			Response.AddHeader("Content-Range", string.Format("bytes {0}-{1}/{2}", start, end, fileSize));
 			Response.AddHeader("Content-Length", (end + 1 - start).ToString());
